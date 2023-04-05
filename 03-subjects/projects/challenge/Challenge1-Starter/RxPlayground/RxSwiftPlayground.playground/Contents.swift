@@ -1,33 +1,46 @@
 import Foundation
-import RxSwift
 import RxRelay
+import RxSwift
 
 example(of: "PublishSubject") {
-  
-  let disposeBag = DisposeBag()
-  
-  let dealtHand = PublishSubject<[(String, Int)]>()
-  
-  func deal(_ cardCount: UInt) {
-    var deck = cards
-    var cardsRemaining = deck.count
-    var hand = [(String, Int)]()
     
-    for _ in 0..<cardCount {
-      let randomIndex = Int.random(in: 0..<cardsRemaining)
-      hand.append(deck[randomIndex])
-      deck.remove(at: randomIndex)
-      cardsRemaining -= 1
+    let disposeBag = DisposeBag()
+    
+    let dealtHand = PublishSubject<[(String, Int)]>()
+    
+    func deal(_ cardCount: UInt) {
+        var deck = cards
+        var cardsRemaining = deck.count
+        var hand = [(String, Int)]()
+        
+        for _ in 0..<cardCount {
+            let randomIndex = Int.random(in: 0..<cardsRemaining)
+            hand.append(deck[randomIndex])
+            deck.remove(at: randomIndex)
+            cardsRemaining -= 1
+        }
+        
+        // Add code to update dealtHand here
+        let handPoints = points(for: hand)
+        if handPoints > 21 {
+            dealtHand.onError(HandError.busted(points: handPoints))
+        } else {
+            dealtHand.onNext(hand)
+        }
     }
     
-    // Add code to update dealtHand here
+    // Add subscription to dealtHand here
+    dealtHand
+        .subscribe(
+            onNext: {
+                print(cardString(for: $0), "for", points(for: $0), "points")
+            },
+            onError: {
+                print(String(describing: $0).capitalized)
+            })
+        .disposed(by: disposeBag)
     
-  }
-  
-  // Add subscription to dealtHand here
-  
-  
-  deal(3)
+    deal(3)
 }
 
 /// Copyright (c) 2020 Razeware LLC
