@@ -29,9 +29,21 @@ example(of: "Challenge 1") {
   
   let input = PublishSubject<Int>()
   
-  // Add your code here
-  
-  
+    input
+        .skipWhile { $0 == 0 }
+        .filter { $0 < 10 }
+        .take(10)
+        .toArray()
+        .subscribe(onSuccess: { array in
+            let phone = phoneNumber(from: array)
+            print(phone)
+            if let contact = contacts[phone] {
+                print("Dialing \(contact) (\(phone))...")
+            } else {
+                print("Contact not found")
+            }
+        })
+    
   input.onNext(0)
   input.onNext(603)
   
@@ -40,7 +52,7 @@ example(of: "Challenge 1") {
   
   // Confirm that 7 results in "Contact not found",
   // and then change to 2 and confirm that Shai is found
-  input.onNext(7)
+  input.onNext(2)
   
   "5551212".forEach {
     if let number = (Int("\($0)")) {
