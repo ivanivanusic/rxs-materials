@@ -1,6 +1,6 @@
 import UIKit
-import RxSwift
 import RxCocoa
+import RxSwift
 
 let elementsPerSecond = 1
 let delay: RxTimeInterval = .milliseconds(1500)
@@ -28,6 +28,12 @@ _ = sourceObservable.subscribe(sourceTimeline)
 
 // Setup the delayed subscription
 
+_  = Observable<Int>
+    .timer(.seconds(3), scheduler: MainScheduler.instance)
+    .flatMap{ _ in
+        sourceObservable.delay(delay, scheduler: MainScheduler.instance)
+    }
+    .subscribe(delayedTimeline)
 // Start coding here
 
 
