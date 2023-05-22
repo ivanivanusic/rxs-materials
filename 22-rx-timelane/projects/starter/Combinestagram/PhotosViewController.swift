@@ -33,6 +33,7 @@
 import UIKit
 import Photos
 import RxSwift
+import RxTimelane
 
 class PhotosViewController: UICollectionViewController {
 
@@ -66,6 +67,7 @@ class PhotosViewController: UICollectionViewController {
     super.viewDidLoad()
     
     let authorized = PHPhotoLibrary.authorized
+      .lane("Photo library auth")
       .share()
     
     authorized
