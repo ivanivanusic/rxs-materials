@@ -60,9 +60,21 @@ class PersonTimelineViewController: NSViewController {
   }
 
   func bindUI() {
-    //bind the window title
+    // Bind the window title
+    let username = "@\(viewModel.username)"
+    viewModel.tweets
+      .drive(onNext: { tweets in
+        NSApp.windows.first?.title = tweets.count == 0 ? "None found" : "\(username)"
+      })
+      .disposed(by: bag)
 
-    //reload the table when tweets come in
+    // Reload the table when tweets come in
+    viewModel.tweets
+      .drive(onNext: { [weak self] tweets in
+        self?.tweets = tweets
+        self?.tableView.reloadData()
+      })
+      .disposed(by: bag)
   }
 }
 

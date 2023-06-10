@@ -65,6 +65,12 @@ class ListPeopleViewController: NSViewController {
       .disposed(by: bag)
 
     //show message when no account available
+    viewModel.people.asDriver()
+      .map { userArray in
+        return userArray != nil
+      }
+      .drive(messageView.rx.isHidden)
+      .disposed(by: bag)
   }
 
   @IBAction func tableViewDidSelectRow(sender: NSTableView) {
