@@ -40,6 +40,8 @@ typealias TaskSection = AnimatableSectionModel<String, TaskItem>
 struct TasksViewModel {
   let sceneCoordinator: SceneCoordinatorType
   let taskService: TaskServiceType
+  
+  lazy var statistics: Observable<TaskStatistics> = self.taskService.statistics()
 
   init(taskService: TaskServiceType, coordinator: SceneCoordinatorType) {
     self.taskService = taskService
@@ -101,14 +103,20 @@ struct TasksViewModel {
 
   lazy var editAction: Action<TaskItem, Swift.Never> = { this in
     return Action { task in
-      let editViewModel = EditTaskViewModel(
+      let editViewModel = PushedEditTaskViewModel(
         task: task,
         coordinator: this.sceneCoordinator,
         updateAction: this.onUpdateTitle(task: task)
       )
       return this.sceneCoordinator
-        .transition(to: Scene.editTask(editViewModel), type: .modal)
+        .transition(to: Scene.pushedEditTask(editViewModel), type: .push)
         .asObservable()
     }
   }(self)
+  
+  lazy var deleteAction: Action<TaskItem, Void> = { (service: TaskServiceType) in
+    return Action { item in
+      return service.delete(task: item)
+    }
+  }(self.taskService)
 }
